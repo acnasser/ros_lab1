@@ -6,21 +6,24 @@ from turtlesim.msg import Pose
 from ros_lab1.msg import TurtleControl
 
 # Global variables are used to store the value of the nodes information
-current_position = None
+current_position = 0.0
 desired_position = 0.0
 control_gain = 0.0
 
 
-# The following functions grabs the gloabal variables and updates the data accordingly
-def pose_callback(data):
-    global current_position
-    current_position = data.x
 
 def control_params_callback(data):
     global desired_position, control_gain
     desired_position = data.xd  
     control_gain = data.kp
 
+
+# The following functions grabs the gloabal variables and updates the data accordingly
+
+def pose_callback(data):
+    global current_position
+    current_position = data.x
+    
 def proportional_controller():
     global current_position, desired_position, control_gain
 
@@ -35,22 +38,29 @@ def proportional_controller():
 
     # Publisher to the turtle's velocity command
     pub = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
-
+    
+    # Add a publisher to with a new topic using the TurtleControl Message
+    # pos_publisher = rospy.Publisher('/turtle1/turtlecontrol', TurtleControl, queue_size=10)
+    
+    vel_cmd = Twist()
+   
     rate = rospy.Rate(10)  # Set the loop to 10 Hz
 
     while not rospy.is_shutdown():
-        if current_position is not None:  # Ensure current_position is not None
-            # Calculate the position error
-            error = desired_position - current_position
+ 
+        # Calculate the position error
+        error = desired_position - current_position
 
-            # Proportional control law: v = Kp * error
-            vel_cmd = Twist()
-            vel_cmd.linear.x = control_gain * error
-            vel_cmd.angular.z = 0.0
+        # Proportional control law: v = Kp * error
+     
+        vel_cmd.linear.x = control_gain * error
+        vel_cmd.angular.z = 0.0
 
-            # Publish the velocity command
-            pub.publish(vel_cmd)
+   
+        # Publish the message
+        pub.publish(vel_cmd)
 
         rate.sleep()
 
 
+proportional_controller()

@@ -73,6 +73,7 @@ add_message_files(
 generate_messages(
 	DEPENDENCIES
     std_msgs
+    geometry_msgs
 )
 
 ################################################
@@ -108,7 +109,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ros_lab1
   CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs turtlesim message_runtime	
-  DEPENDS system_lib
+  #DEPENDS system_lib
 )
 
 ###########
